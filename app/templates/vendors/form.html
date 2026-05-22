@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Vendor &middot; MiniSuite{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>{{ 'New Vendor' if mode == 'create' else 'Edit Vendor' }}</h1>
+  <a class="btn secondary" href="/ui/vendors">Back</a>
+</div>
+<div class="panel">
+  <form onsubmit="event.preventDefault(); save();">
+    <div class="row"><label>Entity ID *</label><input id="entityId" required value="{{ item.entityId if item else '' }}" /></div>
+    <div class="row"><label>Company name</label><input id="companyName" value="{{ item.companyName if item else '' }}" /></div>
+    <div class="row"><label>Email</label><input id="email" type="email" value="{{ item.email if item else '' }}" /></div>
+    <div class="row"><label><input id="isInactive" type="checkbox" {% if item and item.isInactive %}checked{% endif %} /> Inactive</label></div>
+    <div id="msg"></div>
+    <p><button class="btn">{{ 'Create' if mode == 'create' else 'Save' }}</button>
+       {% if mode == 'edit' %}<button type="button" class="btn danger" onclick="del()">Delete</button>{% endif %}</p>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const MODE = "{{ mode }}";
+const ID = "{{ item.id if item else '' }}";
+async function save() {
+  const body = {
+    entityId: document.getElementById("entityId").value,
+    companyName: document.getElementById("companyName").value || document.getElementById("entityId").value,
+    email: document.getElementById("email").value,
+    isInactive: document.getElementById("isInactive").checked,
+    subsidiary: { id: "1" },
+    currency: { id: "1" },
+  };
+  const url = MODE === "create" ? "/services/rest/record/v1/vendor" : "/services/rest/record/v1/vendor/" + ID;
+  const method = MODE === "create" ? "POST" : "PATCH";
+  const r = await window.MINISUITE.api(method, url, body);
+  if (r.ok) window.location.href = "/ui/vendors";
+  else document.getElementById("msg").innerHTML = '<div class="err">' + JSON.stringify(r.body, null, 2) + '</div>';
+}
+async function del() {
+  if (!confirm("Delete this vendor?")) return;
+  const r = await window.MINISUITE.api("DELETE", "/services/rest/record/v1/vendor/" + ID);
+  if (r.ok) window.location.href = "/ui/vendors";
+  else document.getElementById("msg").innerHTML = '<div class="err">' + JSON.stringify(r.body, null, 2) + '</div>';
+}
+</script>
+{% endblock %}

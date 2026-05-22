@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Vendor Bills &middot; MiniSuite{% endblock %}
+{% block content %}
+<h1>Vendor Bills</h1>
+<p class="subtitle">Historical carrier invoices, posted to <code>6011 Freight &amp; Delivery Expense</code>.</p>
+<table>
+  <thead><tr><th>tranId</th><th>Vendor</th><th>Date</th><th class="num">Total</th><th>Memo</th><th></th></tr></thead>
+  <tbody>
+    {% for b in items %}
+    <tr>
+      <td><a href="/ui/vendorBills/{{ b.id }}">{{ b.tranId }}</a></td>
+      <td>{{ vendors[b.entity_id].entityId if b.entity_id in vendors else b.entity_id }}</td>
+      <td>{{ b.tranDate }}</td>
+      <td class="num">${{ "%.2f"|format(b.total|float) }}</td>
+      <td>{{ b.memo }}</td>
+      <td><a href="/ui/vendorBills/{{ b.id }}">View</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
