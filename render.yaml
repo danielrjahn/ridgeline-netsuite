@@ -1,0 +1,18 @@
+# Render.com Blueprint (alternative free host).
+# Free tier sleeps after 15 min of inactivity and has no persistent disk, so the
+# DB re-seeds on each cold start (the seed is idempotent and includes representative
+# data, so the demo works either way).
+services:
+  - type: web
+    name: ridgeline-minisuite
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: MINISUITE_TOKEN
+        value: demo-token-ridgeline
+      - key: MINISUITE_DB
+        value: /tmp/minisuite.sqlite
+      - key: PORT
+        value: "8000"
+    healthCheckPath: /

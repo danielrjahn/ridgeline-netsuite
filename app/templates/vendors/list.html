@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Vendors &middot; MiniSuite{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>Vendors</h1>
+  <a class="btn" href="/ui/vendors/new">+ New Vendor</a>
+</div>
+<table>
+  <thead><tr><th>Entity ID</th><th>Company</th><th>Email</th><th>Inactive</th><th></th></tr></thead>
+  <tbody>
+    {% for v in items %}
+    <tr>
+      <td><a href="/ui/vendors/{{ v.id }}">{{ v.entityId }}</a></td>
+      <td>{{ v.companyName }}</td>
+      <td>{{ v.email }}</td>
+      <td>{{ 'yes' if v.isInactive else '' }}</td>
+      <td><a href="/ui/vendors/{{ v.id }}">Edit</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

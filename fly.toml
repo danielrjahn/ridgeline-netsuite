@@ -1,0 +1,31 @@
+# Fly.io deployment config for MiniSuite.
+# `fly launch --no-deploy --copy-config` reads this; then `fly deploy`.
+# Free allowance covers one always-on shared-cpu-1x with 256 MB RAM.
+app = "ridgeline-minisuite"            # rename per your account
+primary_region = "den"                  # Denver — close to Ridgeline; pick anything
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  MINISUITE_DB = "/data/minisuite.sqlite"
+  # Override at deploy: `fly secrets set MINISUITE_TOKEN=...`
+  MINISUITE_TOKEN = "demo-token-ridgeline"
+
+[[mounts]]
+  source = "minisuite_data"
+  destination = "/data"
+  initial_size = "1gb"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256

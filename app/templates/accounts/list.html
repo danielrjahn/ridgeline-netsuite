@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Accounts &middot; MiniSuite{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>Chart of Accounts</h1>
+  <a class="btn" href="/ui/accounts/new">+ New Account</a>
+</div>
+<table>
+  <thead><tr><th>Number</th><th>Name</th><th>Type</th><th>Inactive</th><th></th></tr></thead>
+  <tbody>
+    {% for a in items %}
+    <tr>
+      <td><a href="/ui/accounts/{{ a.id }}">{{ a.acctNumber }}</a></td>
+      <td>{{ a.acctName }}</td>
+      <td>{{ a.acctType }}</td>
+      <td>{{ 'yes' if a.isInactive else '' }}</td>
+      <td><a href="/ui/accounts/{{ a.id }}">Edit</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
