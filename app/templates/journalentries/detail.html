@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ je.tranId }} &middot; MiniSuite{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>{{ je.tranId }}</h1>
+  <div>
+    <a class="btn secondary" href="/ui/journalEntries">Back</a>
+    <button class="btn danger" onclick="deleteJE()">Delete</button>
+  </div>
+</div>
+
+<div class="panel">
+  <div><strong>Date:</strong> {{ je.tranDate }}</div>
+  <div><strong>Memo:</strong> {{ je.memo or '(none)' }}</div>
+  <div><strong>Posting period:</strong> {{ period.periodName if period else '?' }}
+    {% if period %}<span class="pill {{ 'closed' if period.closed else 'open' }}">{{ 'Closed' if period.closed else 'Open' }}</span>{% endif %}
+  </div>
+  {% if je.reversalDate %}<div><strong>Reversal date:</strong> {{ je.reversalDate }}</div>{% endif %}
+  <div><strong>Approved:</strong> {{ 'yes' if je.approved else 'no' }}</div>
+</div>
+
+<h2>Lines</h2>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Account</th>
+      <th>Vendor</th>
+      <th>Memo</th>
+      <th class="num">Debit</th>
+      <th class="num">Credit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set ns = namespace(debit_total=0, credit_total=0) %}
+    {% for li in je.lines %}
+      {% set acct = accounts.get(li.account_id) %}
+      {% set vendor = vendors.get(li.entity_id) %}
+      {% if li.debit %}{% set ns.debit_total = ns.debit_total + (li.debit|float) %}{% endif %}
+      {% if li.credit %}{% set ns.credit_total = ns.credit_total + (li.credit|float) %}{% endif %}
+      <tr>
+        <td>{{ li.line }}</td>
+        <td>{{ acct.acctNumber if acct }} &middot; {{ acct.acctName if acct }}</td>
+        <td>{{ vendor.entityId if vendor else '' }}</td>
+        <td>{{ li.memo }}</td>
+        <td class="num">{% if li.debit %}${{ "%.2f"|format(li.debit|float) }}{% endif %}</td>
+        <td class="num">{% if li.credit %}${{ "%.2f"|format(li.credit|float) }}{% endif %}</td>
+      </tr>
+    {% endfor %}
+    <tr>
+      <th colspan="4" style="text-align:right">Totals</th>
+      <th class="num">${{ "%.2f"|format(ns.debit_total) }}</th>
+      <th class="num">${{ "%.2f"|format(ns.credit_total) }}</th>
+    </tr>
+  </tbody>
+</table>
+
+<div id="msg"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function deleteJE() {
+  if (!confirm("Delete this journal entry?")) return;
+  const r = await window.MINISUITE.api("DELETE", "/services/rest/record/v1/journalEntry/{{ je.id }}");
+  if (r.ok) { window.location.href = "/ui/journalEntries"; }
+  else { document.getElementById("msg").innerHTML = '<div class="err">' + JSON.stringify(r.body, null, 2) + '</div>'; }
+}
+</script>
+{% endblock %}

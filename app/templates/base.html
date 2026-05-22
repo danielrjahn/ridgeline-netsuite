@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}MiniSuite{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <meta name="minisuite-token" content="{{ token }}" />
+</head>
+<body>
+  <header class="top">
+    <span class="brand">MiniSuite <span class="badge">mock NetSuite</span></span>
+    <a href="/">Home</a>
+    <a href="/ui/journalEntries">Journal Entries</a>
+    <a href="/ui/accounts">Accounts</a>
+    <a href="/ui/vendors">Vendors</a>
+    <a href="/ui/vendorBills">Vendor Bills</a>
+    <a href="/ui/accountingPeriods">Periods</a>
+    <a href="/docs" style="margin-left:auto">Swagger /docs</a>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    MiniSuite &middot; Bearer token: <code>{{ token }}</code> &middot;
+    For the Ridgeline freight-accrual demo (Finance Engineer Cup).
+  </footer>
+  <script>
+    window.MINISUITE = {
+      token: document.querySelector('meta[name="minisuite-token"]').content,
+      async api(method, url, body) {
+        const headers = { "Authorization": "Bearer " + this.token };
+        if (body !== undefined) headers["Content-Type"] = "application/json";
+        const resp = await fetch(url, {
+          method,
+          headers,
+          body: body !== undefined ? JSON.stringify(body) : undefined,
+        });
+        let json = null;
+        const text = await resp.text();
+        try { json = text ? JSON.parse(text) : null; } catch { json = text; }
+        return { ok: resp.ok, status: resp.status, body: json, headers: resp.headers };
+      },
+    };
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

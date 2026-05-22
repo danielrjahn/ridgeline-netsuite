@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Journal Entries &middot; MiniSuite{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>Journal Entries</h1>
+  <a class="btn" href="/ui/journalEntries/new">+ New Journal Entry</a>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>tranId</th>
+      <th>Date</th>
+      <th>Memo</th>
+      <th class="num">Total Debits</th>
+      <th>Period</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    {% set je = row.je %}
+    <tr>
+      <td><a href="/ui/journalEntries/{{ je.id }}">{{ je.tranId }}</a></td>
+      <td>{{ je.tranDate }}</td>
+      <td>{{ je.memo }}</td>
+      <td class="num">${{ "%.2f"|format(row.debit_total|float) }}</td>
+      <td><span class="pill posted">Posted</span></td>
+      <td><a href="/ui/journalEntries/{{ je.id }}">View</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="muted">No journal entries yet. <a href="/ui/journalEntries/new">Create one</a>.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ b.tranId }} &middot; MiniSuite{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>{{ b.tranId }}</h1>
+  <a class="btn secondary" href="/ui/vendorBills">Back</a>
+</div>
+<div class="panel">
+  <div><strong>Vendor:</strong> {{ vendors[b.entity_id].entityId if b.entity_id in vendors else b.entity_id }}</div>
+  <div><strong>Date:</strong> {{ b.tranDate }}</div>
+  <div><strong>Due:</strong> {{ b.dueDate }}</div>
+  <div><strong>Total:</strong> ${{ "%.2f"|format(b.total|float) }}</div>
+  <div><strong>Approval:</strong> {{ b.approvalStatus }}</div>
+  <div><strong>Memo:</strong> {{ b.memo }}</div>
+</div>
+<h2>Expense Lines</h2>
+<table>
+  <thead><tr><th>#</th><th>Account</th><th>Memo</th><th class="num">Amount</th></tr></thead>
+  <tbody>
+    {% for li in b.expense_lines %}
+    {% set a = accounts.get(li.account_id) %}
+    <tr>
+      <td>{{ li.line }}</td>
+      <td>{{ a.acctNumber if a }} &middot; {{ a.acctName if a }}</td>
+      <td>{{ li.memo }}</td>
+      <td class="num">${{ "%.2f"|format(li.amount|float) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Accounting Periods &middot; MiniSuite{% endblock %}
+{% block content %}
+<h1>Accounting Periods</h1>
+<p class="subtitle">Toggle a period open/closed to demonstrate the closed-period control. Mutations
+hit <code>PATCH /services/rest/record/v1/accountingPeriod/{id}</code>.</p>
+<table>
+  <thead><tr><th>Name</th><th>Start</th><th>End</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for p in items %}
+    <tr id="row-{{ p.id }}">
+      <td>{{ p.periodName }}</td>
+      <td>{{ p.startDate }}</td>
+      <td>{{ p.endDate }}</td>
+      <td><span id="status-{{ p.id }}" class="pill {{ 'closed' if p.closed else 'open' }}">{{ 'Closed' if p.closed else 'Open' }}</span></td>
+      <td><button class="btn secondary" onclick="toggle({{ p.id }}, {{ 'true' if p.closed else 'false' }})">{{ 'Reopen' if p.closed else 'Close' }}</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div id="msg"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function toggle(id, currentlyClosed) {
+  const newClosed = !currentlyClosed;
+  const r = await window.MINISUITE.api(
+    "PATCH",
+    "/services/rest/record/v1/accountingPeriod/" + id,
+    { closed: newClosed, allLocked: newClosed, aplocked: newClosed, arlocked: newClosed }
+  );
+  if (r.ok) { window.location.reload(); }
+  else { document.getElementById("msg").innerHTML = '<div class="err">' + JSON.stringify(r.body, null, 2) + '</div>'; }
+}
+</script>
+{% endblock %}

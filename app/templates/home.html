@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>MiniSuite</h1>
+<p class="subtitle">Mock NetSuite REST API for Ridgeline Foods (Finance Engineer Cup).
+Same paths and payload shapes as the real NetSuite REST Record API &mdash; repoint by
+changing only the host and the token.</p>
+
+<div class="panel">
+  <strong>API base path:</strong> <code>/services/rest/record/v1/{recordType}</code><br>
+  <strong>SuiteQL:</strong> <code>POST /services/rest/query/v1/suiteql</code> (requires <code>Prefer: transient</code>)<br>
+  <strong>Auth:</strong> <code>Authorization: Bearer {{ token }}</code><br>
+  <strong>Swagger:</strong> <a href="/docs">/docs</a> &nbsp; <strong>OpenAPI JSON:</strong> <a href="/openapi.json">/openapi.json</a>
+</div>
+
+<h2>Records</h2>
+<div class="grid">
+  <a class="tile" href="/ui/journalEntries">
+    <div class="label">Journal Entries</div><div class="count">{{ counts['Journal Entries'] }}</div>
+  </a>
+  <a class="tile" href="/ui/accounts">
+    <div class="label">Accounts (COA)</div><div class="count">{{ counts['Accounts'] }}</div>
+  </a>
+  <a class="tile" href="/ui/vendors">
+    <div class="label">Vendors</div><div class="count">{{ counts['Vendors'] }}</div>
+  </a>
+  <a class="tile" href="/ui/vendorBills">
+    <div class="label">Vendor Bills</div><div class="count">{{ counts['Vendor Bills'] }}</div>
+  </a>
+  <a class="tile" href="/ui/accountingPeriods">
+    <div class="label">Accounting Periods</div><div class="count">{{ counts['Accounting Periods'] }}</div>
+  </a>
+  <a class="tile" href="/ui/journalEntries/new">
+    <div class="label">Action</div><div class="count" style="font-size:1rem;color:var(--accent)">+ New Journal Entry</div>
+  </a>
+</div>
+{% endblock %}

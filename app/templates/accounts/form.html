@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Account &middot; MiniSuite{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <h1>{{ 'New Account' if mode == 'create' else 'Edit Account' }}</h1>
+  <a class="btn secondary" href="/ui/accounts">Back</a>
+</div>
+<div class="panel">
+  <form id="acct-form" onsubmit="event.preventDefault(); save();">
+    <div class="row"><label>Account number</label><input id="acctNumber" required value="{{ item.acctNumber if item else '' }}" /></div>
+    <div class="row"><label>Account name</label><input id="acctName" required value="{{ item.acctName if item else '' }}" /></div>
+    <div class="row"><label>Type</label>
+      <select id="acctType">
+        {% set types = ["Bank","AcctRec","OthCurrAsset","FixedAsset","AcctPay","OthCurrLiab","LongTermLiab","Equity","Income","COGS","Expense","OthIncome","OthExpense"] %}
+        {% for t in types %}<option value="{{ t }}" {% if item and item.acctType == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="row"><label>Description</label><input id="description" value="{{ item.description if item else '' }}" /></div>
+    <div class="row"><label><input id="isInactive" type="checkbox" {% if item and item.isInactive %}checked{% endif %} /> Inactive</label></div>
+    <div id="msg"></div>
+    <p><button class="btn">{{ 'Create' if mode == 'create' else 'Save' }}</button>
+       {% if mode == 'edit' %}<button type="button" class="btn danger" onclick="del()">Delete</button>{% endif %}</p>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const MODE = "{{ mode }}";
+const ID = "{{ item.id if item else '' }}";
+async function save() {
+  const body = {
+    acctNumber: document.getElementById("acctNumber").value,
+    acctName: document.getElementById("acctName").value,
+    acctType: document.getElementById("acctType").value,
+    description: document.getElementById("description").value,
+    isInactive: document.getElementById("isInactive").checked,
+  };
+  const url = MODE === "create" ? "/services/rest/record/v1/account" : "/services/rest/record/v1/account/" + ID;
+  const method = MODE === "create" ? "POST" : "PATCH";
+  const r = await window.MINISUITE.api(method, url, body);
+  if (r.ok) { window.location.href = "/ui/accounts"; }
+  else { document.getElementById("msg").innerHTML = '<div class="err">' + JSON.stringify(r.body, null, 2) + '</div>'; }
+}
+async function del() {
+  if (!confirm("Delete this account?")) return;
+  const r = await window.MINISUITE.api("DELETE", "/services/rest/record/v1/account/" + ID);
+  if (r.ok) window.location.href = "/ui/accounts";
+  else document.getElementById("msg").innerHTML = '<div class="err">' + JSON.stringify(r.body, null, 2) + '</div>';
+}
+</script>
+{% endblock %}
